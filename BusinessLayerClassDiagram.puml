@@ -289,12 +289,12 @@ OrderService ..|> IOrderService
 LoyaltyService ..|> ILoyaltyService
 
 ' Each service uses DTOs in its corresponding logical group
-IngredientService ..> MIngredient : DTO
-DishService ..> MDish : DTO
-MenuService ..> MMenu : DTO
-CustomerService ..> MCustomer : DTO
-OrderService ..> MOrder : DTO
-LoyaltyService ..> MLoyalty : DTO
+IngredientService ..> MIngredient
+DishService ..> MDish
+MenuService ..> MMenu
+CustomerService ..> MCustomer
+OrderService ..> MOrder
+LoyaltyService ..> MLoyalty
 AutomapperProfile ..> MRoot : maps
 
 ' The three actual DTO-to-DTO collection properties
