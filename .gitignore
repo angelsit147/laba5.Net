@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+**/TestResults/
+.vs/
+.nuget/
+.tools/
+**/*.db
+**/*.db-wal
+**/*.db-shm
+**/*.db-journal
