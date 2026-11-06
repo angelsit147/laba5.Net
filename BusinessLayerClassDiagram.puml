@@ -1,0 +1,329 @@
+@startuml
+!pragma layout smetana
+title RestaurantOrders - Business Layer Class Diagram
+left to right direction
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam dpi 140
+skinparam nodesep 20
+skinparam ranksep 25
+skinparam ArrowColor #64748B
+skinparam classFontSize 11
+skinparam classAttributeFontSize 10
+skinparam packageFontSize 14
+hide circle
+hide empty members
+
+package "Business Layer" {
+
+package "Interfaces" #F2FCFC {
+interface IIngredientService #CCF6F4 {
+  + GetAllAsync() : Task<IReadOnlyList<IngredientDto>>
+  + GetByIdAsync(id: int) : Task<IngredientDto>
+  + CreateAsync(dto: IngredientWriteDto) : Task<IngredientDto>
+  + UpdateAsync(id: int, dto: IngredientWriteDto) : Task<IngredientDto>
+  + DeleteAsync(id: int) : Task
+}
+interface IDishService #CCF6F4 {
+  + GetAllAsync() : Task<IReadOnlyList<DishDto>>
+  + GetByIdAsync(id: int) : Task<DishDto>
+  + CreateAsync(dto: DishWriteDto) : Task<DishDto>
+  + UpdateAsync(id: int, dto: DishWriteDto) : Task<DishDto>
+  + DeleteAsync(id: int) : Task
+}
+interface IMenuService #CCF6F4 {
+  + GetAllAsync(availableOnly: bool = true) : Task<IReadOnlyList<MenuItemDto>>
+  + GetByIdAsync(id: int) : Task<MenuItemDto>
+  + CreateAsync(dto: MenuItemWriteDto) : Task<MenuItemDto>
+  + UpdateAsync(id: int, dto: MenuItemWriteDto) : Task<MenuItemDto>
+  + DeleteAsync(id: int) : Task
+}
+interface ICustomerService #CCF6F4 {
+  + RegisterAsync(dto: CustomerRegistrationDto) : Task<CustomerRegistrationResultDto>
+  + ResolveLoyaltyAsync(dto: LoyaltyCodeDto) : Task<LoyaltyCardDto>
+}
+interface IOrderService #CCF6F4 {
+  + CreateAsync(dto: CreateOrderDto) : Task<OrderDto>
+  + GetByIdAsync(id: int) : Task<OrderDto>
+  + UpdateDraftAsync(id: int, dto: UpdateDraftOrderDto) : Task<OrderDto>
+  + AddItemAsync(id: int, dto: AddOrderItemDto) : Task<OrderDto>
+  + UpdateItemAsync(id: int, itemId: int, dto: UpdateOrderItemDto) : Task<OrderDto>
+  + RemoveItemAsync(id: int, itemId: int) : Task
+  + ConfirmAsync(id: int) : Task<OrderDto>
+  + CompleteAsync(id: int) : Task<OrderDto>
+  + CancelAsync(id: int) : Task<OrderDto>
+}
+interface ILoyaltyService #CCF6F4 {
+  + GetAllAsync() : Task<IReadOnlyList<LoyaltyLevelDto>>
+  + GetByIdAsync(id: int) : Task<LoyaltyLevelDto>
+  + UpdateLevelsAsync(dto: UpdateLoyaltyLevelsDto) : Task<IReadOnlyList<LoyaltyLevelDto>>
+  + RecalculateCustomerAsync(customerId: int, completedOrder: Order) : Task
+}
+}
+package "Services" #F7F4FF {
+class IngredientService #E5E0FA {
+  - unitOfWork : IUnitOfWork
+  - mapper : IMapper
+  --
+  + IngredientService(unitOfWork: IUnitOfWork, mapper: IMapper)
+  + GetAllAsync() : Task<IReadOnlyList<IngredientDto>>
+  + GetByIdAsync(id: int) : Task<IngredientDto>
+  + CreateAsync(dto: IngredientWriteDto) : Task<IngredientDto>
+  + UpdateAsync(id: int, dto: IngredientWriteDto) : Task<IngredientDto>
+  + DeleteAsync(id: int) : Task
+}
+class DishService #E5E0FA {
+  - unitOfWork : IUnitOfWork
+  - mapper : IMapper
+  --
+  + DishService(unitOfWork: IUnitOfWork, mapper: IMapper)
+  + GetAllAsync() : Task<IReadOnlyList<DishDto>>
+  + GetByIdAsync(id: int) : Task<DishDto>
+  + CreateAsync(dto: DishWriteDto) : Task<DishDto>
+  + UpdateAsync(id: int, dto: DishWriteDto) : Task<DishDto>
+  + DeleteAsync(id: int) : Task
+}
+class MenuService #E5E0FA {
+  - unitOfWork : IUnitOfWork
+  - mapper : IMapper
+  --
+  + MenuService(unitOfWork: IUnitOfWork, mapper: IMapper)
+  + GetAllAsync(availableOnly: bool = true) : Task<IReadOnlyList<MenuItemDto>>
+  + GetByIdAsync(id: int) : Task<MenuItemDto>
+  + CreateAsync(dto: MenuItemWriteDto) : Task<MenuItemDto>
+  + UpdateAsync(id: int, dto: MenuItemWriteDto) : Task<MenuItemDto>
+  + DeleteAsync(id: int) : Task
+}
+class CustomerService #E5E0FA {
+  - unitOfWork : IUnitOfWork
+  - mapper : IMapper
+  --
+  + CustomerService(unitOfWork: IUnitOfWork, mapper: IMapper)
+  + RegisterAsync(dto: CustomerRegistrationDto) : Task<CustomerRegistrationResultDto>
+  + ResolveLoyaltyAsync(dto: LoyaltyCodeDto) : Task<LoyaltyCardDto>
+}
+class OrderService #E5E0FA {
+  - unitOfWork : IUnitOfWork
+  - loyaltyService : ILoyaltyService
+  --
+  + OrderService(unitOfWork: IUnitOfWork, loyaltyService: ILoyaltyService)
+  + CreateAsync(dto: CreateOrderDto) : Task<OrderDto>
+  + GetByIdAsync(id: int) : Task<OrderDto>
+  + UpdateDraftAsync(id: int, dto: UpdateDraftOrderDto) : Task<OrderDto>
+  + AddItemAsync(id: int, dto: AddOrderItemDto) : Task<OrderDto>
+  + UpdateItemAsync(id: int, itemId: int, dto: UpdateOrderItemDto) : Task<OrderDto>
+  + RemoveItemAsync(id: int, itemId: int) : Task
+  + ConfirmAsync(id: int) : Task<OrderDto>
+  + CompleteAsync(id: int) : Task<OrderDto>
+  + CancelAsync(id: int) : Task<OrderDto>
+}
+class LoyaltyService #E5E0FA {
+  - unitOfWork : IUnitOfWork
+  - mapper : IMapper
+  --
+  + LoyaltyService(unitOfWork: IUnitOfWork, mapper: IMapper)
+  + GetAllAsync() : Task<IReadOnlyList<LoyaltyLevelDto>>
+  + GetByIdAsync(id: int) : Task<LoyaltyLevelDto>
+  + UpdateLevelsAsync(dto: UpdateLoyaltyLevelsDto) : Task<IReadOnlyList<LoyaltyLevelDto>>
+  + RecalculateCustomerAsync(customerId: int, completedOrder: Order) : Task
+}
+}
+package "Models" as MRoot #F4F9FF {
+package "Ingredient" as MIngredient #F8FBFE {
+class IngredientDto #E8F3FD {
+  + Id : int
+  + Name : string
+}
+class IngredientWriteDto #E8F3FD {
+  + Name : string
+}
+}
+package "Dish" as MDish #F8FBFE {
+class DishDto #E8F3FD {
+  + Id : int
+  + Name : string
+  + Description : string?
+  + IsAvailable : bool
+  + Ingredients : IReadOnlyList<IngredientDto>
+}
+class DishWriteDto #E8F3FD {
+  + Name : string
+  + Description : string?
+  + IsAvailable : bool?
+  + IngredientIds : IReadOnlyList<int>
+}
+}
+package "Menu" as MMenu #F8FBFE {
+class MenuItemDto #E8F3FD {
+  + Id : int
+  + DishId : int
+  + DishName : string
+  + PortionName : string
+  + PortionDescription : string
+  + Price : decimal
+  + IsAvailable : bool
+}
+class MenuItemWriteDto #E8F3FD {
+  + DishId : int
+  + PortionName : string
+  + PortionDescription : string
+  + Price : decimal
+  + IsAvailable : bool?
+}
+}
+package "Customer" as MCustomer #F8FBFE {
+class CustomerRegistrationDto #E8F3FD {
+  + FirstName : string
+  + LastName : string
+  + PhoneNumber : string?
+}
+class CustomerRegistrationResultDto #E8F3FD {
+  + LoyaltyCode : string
+  + LevelName : string
+  + DiscountPercent : decimal
+}
+class LoyaltyCodeDto #E8F3FD {
+  + LoyaltyCode : string
+}
+class LoyaltyCardDto #E8F3FD {
+  + LevelName : string
+  + DiscountPercent : decimal
+}
+}
+package "Order" as MOrder #F8FBFE {
+class OrderDto #E8F3FD {
+  + Id : int
+  + CreatedAt : DateTime
+  + Status : OrderStatus
+  + OrderType : OrderType
+  + DiscountPercentFixed : decimal?
+  + AppliedDiscountPercent : decimal
+  + IsEstimate : bool
+  + Items : IReadOnlyList<OrderItemDto>
+  + Subtotal : decimal
+  + DiscountAmount : decimal
+  + Total : decimal
+}
+class OrderItemDto #E8F3FD {
+  + Id : int
+  + MenuItemId : int
+  + Quantity : int
+  + UnitPrice : decimal
+  + DishName : string
+  + PortionName : string
+  + PortionDescription : string
+  + IsAvailable : bool?
+  + LineTotal : decimal
+}
+class CreateOrderDto #E8F3FD {
+  + OrderType : OrderType
+  + LoyaltyCode : string?
+}
+class UpdateDraftOrderDto #E8F3FD {
+  + OrderType : OrderType
+  + LoyaltyCode : string?
+}
+class AddOrderItemDto #E8F3FD {
+  + MenuItemId : int
+  + Quantity : int
+}
+class UpdateOrderItemDto #E8F3FD {
+  + Quantity : int
+}
+}
+package "Loyalty" as MLoyalty #F8FBFE {
+class LoyaltyLevelDto #E8F3FD {
+  + Id : int
+  + Name : string
+  + DiscountPercent : decimal
+  + MinOrders : int
+  + MinTotalSpent : decimal
+}
+class UpdateLoyaltyLevelsDto #E8F3FD {
+  + Levels : IReadOnlyList<UpdateLoyaltyLevelDto>
+}
+class UpdateLoyaltyLevelDto #E8F3FD {
+  + Id : int
+  + DiscountPercent : decimal
+  + MinOrders : int
+  + MinTotalSpent : decimal
+}
+}
+}
+package "Support" #FFF7F5 {
+class AutomapperProfile #E5F5E8 {
+  + AutomapperProfile()
+}
+class OrderPricing <<static>> #FFF0C6 {
+  + LineTotal(quantity: int, unitPrice: decimal) : decimal
+  + Calculate(items, discountPercent: decimal) : (decimal, decimal, decimal)
+  + HistoricalTotal(order: Order) : decimal
+  + ValidateDiscountPercent(value: decimal) : void
+}
+class LoyaltyPolicyValidator <<static>> #FBE5E3 {
+  + ValidateAndOrder(levels: IReadOnlyCollection<LoyaltyLevel>) : IReadOnlyList<LoyaltyLevel>
+}
+class RestaurantException #FBE5E3 {
+  + ErrorType : RestaurantErrorType
+  + Code : string
+  --
+  + RestaurantException(errorType: RestaurantErrorType, code: string, message: string)
+}
+enum RestaurantErrorType #FBE5E3 {
+  Validation
+  NotFound
+  Conflict
+}
+}
+}
+
+' Interfacing between services and their contracts
+IngredientService ..|> IIngredientService
+DishService ..|> IDishService
+MenuService ..|> IMenuService
+CustomerService ..|> ICustomerService
+OrderService ..|> IOrderService
+LoyaltyService ..|> ILoyaltyService
+
+' Each service uses DTOs in its corresponding logical group
+IngredientService ..> MIngredient : DTO
+DishService ..> MDish : DTO
+MenuService ..> MMenu : DTO
+CustomerService ..> MCustomer : DTO
+OrderService ..> MOrder : DTO
+LoyaltyService ..> MLoyalty : DTO
+AutomapperProfile ..> MRoot : maps
+
+' The three actual DTO-to-DTO collection properties
+DishDto --> "0..*" IngredientDto : Ingredients
+OrderDto --> "0..*" OrderItemDto : Items
+UpdateLoyaltyLevelsDto --> "0..*" UpdateLoyaltyLevelDto : Levels
+
+' Central business dependencies
+OrderService ..> ILoyaltyService
+OrderService ..> OrderPricing
+LoyaltyService ..> LoyaltyPolicyValidator
+LoyaltyService ..> OrderPricing
+LoyaltyPolicyValidator ..> OrderPricing
+RestaurantException --> RestaurantErrorType
+
+' Alignment controls: one row for each service/contract/DTO group
+IIngredientService -[hidden]- IDishService
+IngredientService -[hidden]- DishService
+MIngredient -[hidden]- MDish
+IDishService -[hidden]- IMenuService
+DishService -[hidden]- MenuService
+MDish -[hidden]- MMenu
+IMenuService -[hidden]- ICustomerService
+MenuService -[hidden]- CustomerService
+MMenu -[hidden]- MCustomer
+ICustomerService -[hidden]- IOrderService
+CustomerService -[hidden]- OrderService
+MCustomer -[hidden]- MOrder
+IOrderService -[hidden]- ILoyaltyService
+OrderService -[hidden]- LoyaltyService
+MOrder -[hidden]- MLoyalty
+@enduml
