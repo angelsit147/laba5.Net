@@ -33,7 +33,6 @@ builder.Services.Configure<LoyaltySeedOptions>(builder.Configuration.GetSection(
 builder.Services.AddScoped<DataSeeder>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.Converters.Add(new OrderTypeJsonConverter());
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false));
     options.JsonSerializerOptions.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow;
 }).ConfigureApiBehaviorOptions(options =>
@@ -79,5 +78,3 @@ await using (var scope = app.Services.CreateAsyncScope())
 }
 
 app.Run();
-
-public partial class Program { }

@@ -32,9 +32,9 @@ public class DataSeeder
 
         var levels = new[]
         {
-            new LoyaltyLevel { Id = 1, Name = "Basic" },
-            FromOptions(2, "Silver", options.Silver),
-            FromOptions(3, "Gold", options.Gold)
+            new LoyaltyLevel { Name = "Basic" },
+            FromOptions("Silver", options.Silver),
+            FromOptions("Gold", options.Gold)
         };
         try
         {
@@ -47,15 +47,13 @@ public class DataSeeder
 
         foreach (var level in levels)
         {
-
-            level.Id = 0;
             await unitOfWork.LoyaltyLevels.AddAsync(level, ct);
         }
 
         await unitOfWork.SaveAsync(ct);
     }
 
-    private static LoyaltyLevel FromOptions(int id, string name, LoyaltySeedOptions.LevelOptions? values)
+    private static LoyaltyLevel FromOptions(string name, LoyaltySeedOptions.LevelOptions? values)
     {
         if (values?.MinOrders is null || values.MinTotalSpent is null || values.DiscountPercent is null)
         {
@@ -64,7 +62,7 @@ public class DataSeeder
 
         return new LoyaltyLevel
         {
-            Id = id, Name = name, MinOrders = values.MinOrders.Value,
+            Name = name, MinOrders = values.MinOrders.Value,
             MinTotalSpent = values.MinTotalSpent.Value, DiscountPercent = values.DiscountPercent.Value
         };
     }

@@ -6,16 +6,13 @@
 ## Технології
 
 C#, .NET 8, ASP.NET Core Web API, Entity Framework Core, SQLite,
-AutoMapper, Swagger/OpenAPI, NUnit і Moq.
+AutoMapper, Swagger/OpenAPI.
 
 ## Структура
 
 - `Data` — сутності, EF Core migrations, репозиторії та UnitOfWork.
 - `Business` — DTO, сервіси, перевірки даних, розрахунок цін і лояльність.
 - `WebApi` — HTTP-контролери, конфігурація та запуск застосунку.
-- `Data.Tests` — перевірки збереження даних, обмежень SQLite і транзакцій.
-- `Business.Tests` — перевірки сервісів, цін і бізнес-правил.
-- `WebApi.Tests` — перевірки HTTP API на тимчасових SQLite-базах.
 
 ## Можливості
 
@@ -24,7 +21,7 @@ AutoMapper, Swagger/OpenAPI, NUnit і Moq.
 - Фіксація цін і знижки під час підтвердження замовлення.
 - Реєстрація клієнтів із кодом лояльності та рівнями Basic, Silver і Gold.
 
-Початкові рівні налаштовуються в `WebApi/appsettings.Development.json`:
+Початкові рівні налаштовуються в `WebApi/appsettings.json`:
 Basic — 0 замовлень, 0 грн, 0%; Silver — 5 замовлень, 2000 грн, 5%;
 Gold — 10 замовлень, 5000 грн, 10%.
 Для підвищення рівня потрібні одночасно обидва пороги: кількість завершених
@@ -48,14 +45,5 @@ EF Core migrations, після чого додаються початкові р
 Підключення задається в `ConnectionStrings:RestaurantDb` у `WebApi/appsettings.json`;
 типовий файл бази — `restaurant.db` у робочій папці WebApi.
 Для чистого запуску з наведеним профілем додаткове налаштування не потрібне.
-
-## Тестування
-
-```powershell
-dotnet test Restaurant.sln
-```
-
-Команда запускає `Data.Tests`, `Business.Tests` і `WebApi.Tests`.
-Інтеграційні тести використовують окремі тимчасові бази, без робочої `restaurant.db`.
 
 Діаграми: [ER-модель](ER_diagram.png) і [класи Business](BusinessLayerClassDiagram.puml).
